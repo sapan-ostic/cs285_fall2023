@@ -1,5 +1,11 @@
 ## Install dependencies
 
+Install `swig` for package management:
+```
+sudo apt-get update
+sudo apt-get install swig
+```
+
 There are two options:
 
 A. (Recommended) Install with conda:
