@@ -129,9 +129,17 @@ class MLPPolicySL(BasePolicy, nn.Module, metaclass=abc.ABCMeta):
         # through it. For example, you can return a torch.FloatTensor. You can also
         # return more flexible objects, such as a
         # `torch.distributions.Distribution` object. It's up to you!
-        raise NotImplementedError
+        mean = self.mean_net(observation)  # (batch_size, ac_dim)
+        std = torch.exp(self.logstd)  # (ac_dim,)
 
-    def update(self, observations, actions):
+        # Expand std to match the batch size
+        std = std.expand(observation.shape[0], self.ac_dim)
+
+        # Create a normal distribution with the mean and std
+        action_dist = distributions.Normal(mean, std)
+        return action_dist
+
+    def update(self, obs, acs, **kwargs):
         """
         Updates/trains the policy
 
@@ -141,7 +149,20 @@ class MLPPolicySL(BasePolicy, nn.Module, metaclass=abc.ABCMeta):
             dict: 'Training Loss': supervised learning loss
         """
         # TODO: update the policy and return the loss
-        loss = TODO
+        # Get predicted mean action from policy
+        self.optimizer.zero_grad()
+        obs = ptu.from_numpy(obs)
+        acs = ptu.from_numpy(acs)
+        action_distribution = self.forward(obs)
+
+        # Negative log-likelihood loss
+        log_prob = action_distribution.log_prob(acs)
+        loss = -log_prob.mean()
+
+        # Perform optimization step
+        loss.backward()  # compute gradients
+        self.optimizer.step()
+
         return {
             # You can add extra logging information here, but keep this line
             'Training Loss': ptu.to_numpy(loss),
