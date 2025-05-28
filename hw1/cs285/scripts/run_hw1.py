@@ -255,6 +255,8 @@ def main():
     parser.add_argument('--max_replay_buffer_size', type=int, default=1000000)
     parser.add_argument('--save_params', action='store_true')
     parser.add_argument('--seed', type=int, default=1)
+    parser.add_argument('--log_dir', type=str, default=None,
+                        help='Directory to save logs. If None, will create a new directory based on the experiment name and environment name.')
     args = parser.parse_args()
 
     # convert args to dictionary
@@ -277,10 +279,15 @@ def main():
     data_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), '../../data')
     if not (os.path.exists(data_path)):
         os.makedirs(data_path)
-    logdir = logdir_prefix + args.exp_name + '_' + args.env_name + '_' + time.strftime("%d-%m-%Y_%H-%M-%S")
-    logdir = os.path.join(data_path, logdir)
+    
+    logdir = args.log_dir
+    print('logdir:', logdir)
+    if args.log_dir is None:
+        logdir = logdir_prefix + args.exp_name + '_' + args.env_name + '_' + time.strftime("%d-%m-%Y_%H-%M-%S")
+        logdir = os.path.join(data_path, logdir)
+    
     params['logdir'] = logdir
-    if not(os.path.exists(logdir)):
+    if not (os.path.exists(logdir)):
         os.makedirs(logdir)
 
     ###################
