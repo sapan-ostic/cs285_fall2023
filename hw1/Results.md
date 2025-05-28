@@ -1,9 +1,9 @@
 ## Behavior Cloning Policy Implementation and Training Report
 
-[!bc_ant](/hw1/data/media/bc_ant.gif)
-[!bc_walker](/hw1/data/media/bc_walker.gif)
-[!bc_hopper](/hw1/data/media/bc_hopper.gif)
-[!bc_cheetah](/hw1/data/media/bc_half_cheetah.gif)
+![bc_ant](/hw1/data/media/bc_ant.gif)
+![bc_walker](/hw1/data/media/bc_walker.gif)
+![bc_hopper](/hw1/data/media/bc_hopper.gif)
+![bc_cheetah](/hw1/data/media/bc_half_cheetah.gif)
 
 ### Setup
 Please refer to the [README.md](README.md) file for detailed setup instructions, environment requirements, and installation steps. 
@@ -32,7 +32,7 @@ Please refer to the [README.md](README.md) file for detailed setup instructions,
 
 ### Model Architecture
 
-The policy $\pi_\theta(a \mid s)$ is parameterized as a Multi-Layer Perceptron (MLP) neural network that maps observations $s \in \mathbb{R}^{d_{\text{obs}}}$ to actions $a \in \mathbb{R}^{d_{\text{act}}}$. The MLP is defined as follows:
+The policy $`\pi_\theta(a \mid s)`$ is parameterized as a Multi-Layer Perceptron (MLP) neural network that maps observations $s \in \mathbb{R}^{d_{\text{obs}}}$ to actions $a \in \mathbb{R}^{d_{\text{act}}}$. The MLP is defined as follows:
 
 - **Input layer:** Dimension $d_{\text{obs}}$ corresponding to the observation space
 - **Hidden layers:** $n_{\text{layers}}$ fully connected layers, each with $\text{size}$ units and $\tanh$ activation function
@@ -40,10 +40,12 @@ The policy $\pi_\theta(a \mid s)$ is parameterized as a Multi-Layer Perceptron (
 
 The network outputs the **mean** of a Gaussian distribution over actions: $\mu_\theta(s) = \text{MLP}_\theta(s)$
 
-The **standard deviation** $\sigma$ is modeled as a separate neural network, `self.logstd_net`, which maps the observation $s$ to a vector in $\mathbb{R}^{d_{\text{act}}}$: $\text{logstd}_\theta(s) = \text{logstd\_net}(s), \quad \sigma = \exp(\text{logstd}_\theta(s))$
+The **standard deviation** $`\sigma`$ is modeled as a separate neural network, `self.logstd_net`, which maps the observation $`s`$ to a vector in $`\mathbb{R}^{d_{\text{act}}}`$: $`\text{logstd}_\theta(s) = \text{logstd\_net}(s), \quad \sigma = \exp(\text{logstd}_\theta(s))`$
 
-The resulting action distribution is modeled as: $\pi_\theta(a \mid s) = \mathcal{N}(a; \mu_\theta(s), \operatorname{diag}(\sigma^2))$
-
+The resulting action distribution is modeled as:
+```math
+\pi_\theta(a \mid s) = \mathcal{N}(a; \mu_\theta(s), \text{diag}(\sigma^2))
+```
 ### Forward Pass
 
 The `forward` method of the policy constructs a Gaussian distribution over actions:
@@ -62,9 +64,9 @@ This method returns a `torch.distributions.Normal` object, which allows sampling
 
 The policy is trained via **Behavior Cloning** using supervised learning. The loss function is the **negative log-likelihood** of the expert actions under the predicted action distribution:
 
-$$
+```math
 \mathcal{L}_{\text{BC}}(\theta) = -\frac{1}{N} \sum_{i=1}^N \log \pi_\theta(a_i^{\text{expert}} \mid s_i)
-$$
+```
 
 Here, $\log \pi_\theta(a \mid s)$ refers to the logarithm of the probability density of action $a$ under the policy's Gaussian distribution at state $s$. Intuitively, this measures how likely the expert's action is according to the current policy. The more confident and accurate the policy is in predicting the expert's action, the higher this probability (and the lower the negative log-likelihood).
 
@@ -93,7 +95,7 @@ def update(self, obs, acs, **kwargs):
 
 - `obs` and `acs` are batched observations and expert actions, respectively.
 - The loss is computed as the **mean** of the negative log-probabilities.
-- The optimizer used is **Adam**, which updates both the mean network $\theta$ and the log standard deviation network $\text{logstd\_net}$.
+- The optimizer used is **Adam**, which updates both the mean network $`\theta`$ and the log standard deviation network $`\text{logstd\_net}`$.
 
 ### Training Notes
 
