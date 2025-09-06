@@ -32,7 +32,7 @@ Please refer to the [README.md](README.md) file for detailed setup instructions,
 
 ### Model Architecture
 
-The policy $`\pi_\theta(a \mid s)`$ is parameterized as a Multi-Layer Perceptron (MLP) neural network that maps observations $s \in \mathbb{R}^{d_{\text{obs}}}$ to actions $a \in \mathbb{R}^{d_{\text{act}}}$. The MLP is defined as follows:
+The policy $\pi_\theta(a \mid s)$ is parameterized as a Multi-Layer Perceptron (MLP) neural network that maps observations $s \in \mathbb{R}^{d_{\text{obs}}}$ to actions $a \in \mathbb{R}^{d_{\text{act}}}$. The MLP is defined as follows:
 
 - **Input layer:** Dimension $d_{\text{obs}}$ corresponding to the observation space
 - **Hidden layers:** $n_{\text{layers}}$ fully connected layers, each with $\text{size}$ units and $\tanh$ activation function
@@ -40,7 +40,7 @@ The policy $`\pi_\theta(a \mid s)`$ is parameterized as a Multi-Layer Perceptron
 
 The network outputs the **mean** of a Gaussian distribution over actions: $\mu_\theta(s) = \text{MLP}_\theta(s)$
 
-The **standard deviation** $`\sigma`$ is modeled as a separate neural network, `self.logstd_net`, which maps the observation $`s`$ to a vector in $`\mathbb{R}^{d_{\text{act}}}`$: $`\text{logstd}_\theta(s) = \text{logstd\_net}(s), \quad \sigma = \exp(\text{logstd}_\theta(s))`$
+The **standard deviation** $\sigma$ is modeled as a separate neural network, `self.logstd_net`, which maps the observation $s$ to a vector in $\mathbb{R}^{d_{\text{act}}}$: $\text{logstd}_\theta(s) = \text{logstd\_net}(s), \quad \sigma = \exp(\text{logstd}_\theta(s))$
 
 The resulting action distribution is modeled as:
 ```math
@@ -95,7 +95,7 @@ def update(self, obs, acs, **kwargs):
 
 - `obs` and `acs` are batched observations and expert actions, respectively.
 - The loss is computed as the **mean** of the negative log-probabilities.
-- The optimizer used is **Adam**, which updates both the mean network $`\theta`$ and the log standard deviation network $`\text{logstd\_net}`$.
+- The optimizer used is **Adam**, which updates both the mean network $\theta$ and the log standard deviation network $\text{logstd\_net}$.
 
 ### Training Notes
 
